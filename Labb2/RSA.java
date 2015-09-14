@@ -6,10 +6,11 @@ public class RSA
 
     public static void main(String[] args) {
 
-        BigInteger p, q, n, z;
-        BigInteger j, c, e, m;
+        BigInteger p, q, n, z = new BigInteger("0");
+        BigInteger j, c, e, m = new BigInteger("0");
         BigInteger k = new BigInteger("2");
-        int d;
+        BigInteger l = new BigInteger("2");
+        int d = 0;
         String message = "";
         String encryptKey = "";
 
@@ -32,18 +33,29 @@ public class RSA
             }
             k = k.nextProbablePrime();
         }
-
+        System.out.println("");
+        System.out.println("Beräknar j");
         while(true) {
-           j = k.nextProbablePrime();
-           // System.out.println((e.multiply(j)).mod(z));
+            j = l.nextProbablePrime();
+            System.out.println((e.multiply(j)) + " % " + z + " = " + e.multiply(j).mod(z));
 
             if( (e.multiply(j)).mod(z).equals( new BigInteger("1"))){
-                break;
+                if(j.intValue() > z.intValue()){
+                    j = new BigInteger("0");
+                    e = k.nextProbablePrime();
+                    k = k.nextProbablePrime();
+                }
+                else {
+                    break;
+                }
             }
-            k = k.nextProbablePrime();
+            l = l.nextProbablePrime();
         }
+
         // Public keys (j,n)
         //Private keys (e,n)
+        System.out.println("");
+
         System.out.println("( j = "+ j +", n = "+ n +")");
         System.out.println("( e = "+ e +", n = "+ n +")");
         //Create Message
@@ -68,10 +80,11 @@ public class RSA
         // e = P^e
         System.out.println("n = "+  n);
         System.out.println("j = "+  j);
+        System.out.println("");
         c = P.pow(j.intValue());
-        System.out.println("c_1 = " + c);
+//        System.out.println("c_1 = " + c);
         c = c.mod(n);
-        System.out.println("c_2 = " + c);
+  //      System.out.println("c_2 = " + c);
 
         //c is sent to sender
         //private keys are known (e,n)
@@ -80,17 +93,45 @@ public class RSA
         System.out.println("m_1 = " + m);
         m = m.mod(n);
         System.out.println("m_2 = " + m);
-
+        //fungerar när resten fungerar ordentligt
+        decrypt(m);
 
     }
     public static void decrypt(BigInteger s){
+        String lengthString = ""+s;
+        int length = lengthString.length();
+       // System.out.println( length.length() );
+
         int encrypter = s.intValue();
-        if(encrypter%2 == 0){
+
+        String alph = "abcdefghijlkmnopqrstuvwxyz";
+        int i = 0;
+        String de = "";
+        System.out.println("length of message =" +length);
+        if(length %2 == 0){
             String string = ""+encrypter;
+
+            while(i < length)
+            {
+               // System.out.println(i + " < " + length);
+                String sub_s = string.substring(i, i+2);
+                de += Character.toString(alph.charAt(Integer.valueOf(sub_s)-1));
+                i = i+2;
+            }
         }
         else{
             String string = "0"+encrypter;
+            length = length+1;
+
+            while(i < length)
+            {
+              //  System.out.println(i + " < " + length);
+                String sub_s = string.substring(i, i+2);
+                de += Character.toString(alph.charAt(Integer.valueOf(sub_s)-1));
+                i = i+2;
+            }
         }
+        System.out.println(de);
     }
 
     public static String indexOfLetter(String s)
@@ -126,7 +167,7 @@ public class RSA
     public static BigInteger generatePrime()
     {
         // create and assign value to bitLength
-        int bitLength = 8;
+        int bitLength = 9;
         // create a random object
         Random rnd = new Random();
         // assign probablePrime result to bi using bitLength and rnd
